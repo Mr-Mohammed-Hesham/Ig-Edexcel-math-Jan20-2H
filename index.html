@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 📝 غيّر عنوان الامتحان والوصف هنا -->
+    <title>2H-Jan-2020 | Mr. Mohammed Hesham</title>
+    <meta name="description" content="امتحان تفاعلي شامل - منصة مستر محمد هشام">
+    <meta name="author" content="Mr. Mohammed Hesham">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        body.en-mode { font-family: 'Inter', sans-serif; }
+        .correct { background-color: #dcfce7 !important; border-color: #16a34a !important; }
+        .incorrect { background-color: #fee2e2 !important; border-color: #dc2626 !important; }
+        .timer-warning { color: #dc2626 !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 50% { opacity: 0.7; } }
+        @media print { .no-print { display: none !important; } }
+        .success-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.875rem; }
+        .grade-excellent { background: #dcfce7; color: #166534; }
+        .grade-good { background: #fef3c7; color: #92400e; }
+        .grade-pass { background: #dbeafe; color: #1e40af; }
+        .grade-fail { background: #fee2e2; color: #991b1b; }
+        .lang-switch {
+            position: fixed; top: 16px; left: 16px; z-index: 100;
+            background: white; padding: 6px; border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; gap: 4px;
+            border: 2px solid #0d9488;
+        }
+        [dir="ltr"] .lang-switch { left: auto; right: 16px; }
+        .lang-btn {
+            padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold;
+            transition: all 0.3s; border: none; font-size: 0.875rem;
+            background: transparent; color: #6b7280;
+        }
+        .lang-btn.active { background: #0d9488; color: white; box-shadow: 0 2px 6px rgba(13,148,136,0.4); }
+        .lang-btn:hover:not(.active) { background: #f0fdfa; color: #0d9488; }
+        .shuffle-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            color: white; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: bold; margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        .math-display {
+            display: inline-block; direction: ltr;
+            font-family: 'Times New Roman', 'Cambria Math', serif;
+            font-size: 1.2em; font-style: italic;
+            padding: 2px 8px; background: #f0fdfa;
+            border-radius: 6px; margin: 2px;
+            color: #0f766e; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .save-indicator {
+            position: fixed; bottom: 20px; left: 20px; z-index: 200;
+            background: #10b981; color: white; padding: 8px 16px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+        }
+        .save-indicator.show { opacity: 1; }
+        .formula-box {
+            background: #f0fdfa; border: 2px solid #14b8a6;
+            border-radius: 8px; padding: 12px; margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+            direction: ltr; text-align: center;
+        }
+        .exam-diagram-container {
+            display: flex; justify-content: center; align-items: center;
+            margin: 14px 0; width: 100%; overflow-x: auto;
+        }
+        .exam-diagram {
+            max-width: 100%; height: auto; margin: 8px auto; display: block;
+            background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px;
+            padding: 10px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        .exam-table-container {
+            width: 100%; overflow-x: auto; margin: 12px 0;
+        }
+        .exam-table {
+            width: 100%; max-width: 520px; margin: 0 auto;
+            border-collapse: collapse; font-size: 0.88rem; text-align: center;
+            background-color: #ffffff; border-radius: 8px; overflow: hidden;
+            border: 1.5px solid #cbd5e1;
+        }
+        .exam-table th {
+            background-color: #f0fdfa; color: #0f766e; font-weight: bold;
+            padding: 8px 12px; border: 1px solid #ccfbf1;
+        }
+        .exam-table td {
+            padding: 6px 12px; border: 1px solid #e2e8f0; color: #1e293b;
+            font-family: 'Times New Roman', serif;
+        }
+        .exam-table tr:nth-child(even) { background-color: #f8fafc; }
+        .q-meta-badges {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; align-items: center;
+        }
+        .q-category-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;
+            font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 9999px;
+        }
+        .q-law-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #fef3c7; color: #b45309; border: 1px solid #fde68a;
+            font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 9999px;
+            font-family: 'Times New Roman', 'Cambria Math', serif; direction: ltr;
+        }
+        .q-type-interactive {
+            background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
+        }
+        .q-type-graph {
+            background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-teal-50 to-emerald-50 text-gray-800 p-4 md:p-8 min-h-screen">
+
+    <div class="lang-switch no-print">
+        <button class="lang-btn active" onclick="setLanguage('ar')" id="btn-ar">عربي</button>
+        <button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+    </div>
+
+    <div id="saveIndicator" class="save-indicator"> <span data-ar="تم الحفظ" data-en="Saved">تم الحفظ</span></div>
+
+    <div id="timer-container" class="max-w-4xl mx-auto mb-4 text-center no-print">
+        <div class="bg-white p-4 rounded-2xl shadow-md inline-block border-2 border-teal-100">
+            <span class="text-gray-600 ml-2" data-ar="الوقت المتبقي:" data-en="Time Remaining:">⏰ الوقت المتبقي:</span>
+            <span id="timer" class="text-2xl font-bold text-teal-600 font-mono">45:00</span>
+            <span class="shuffle-badge" data-ar="🎲 أسئلة عشوائية" data-en="🎲 Random Questions">🎲 أسئلة عشوائية</span>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto mb-6 flex flex-wrap gap-3 justify-center no-print">
+        <button onclick="toggleAnswers()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-xl font-medium transition shadow cursor-pointer" data-ar="👀 إظهار / إخفاء الإجابات" data-en="👀 Show / Hide Answers">👀 إظهار / إخفاء الإجابات</button>
+        <button onclick="window.print()" class="bg-gray-700 hover:bg-gray-900 text-white px-5 py-2 rounded-xl font-medium transition shadow cursor-pointer" data-ar="🖨️ طباعة" data-en="🖨️ Print">🖨️ طباعة</button>
+        <button onclick="reshuffleExam()" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-5 py-2 rounded-xl font-medium transition shadow cursor-pointer" data-ar="🔄 أسئلة جديدة" data-en="🔄 New Questions">🔄 أسئلة جديدة</button>
+        <button onclick="clearProgress()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-medium transition shadow cursor-pointer" data-ar="🗑️ مسح التقدم" data-en="🗑️ Clear Progress">🗑️ مسح التقدم</button>
+    </div>
+
+    <!-- 📝 عناوين الامتحان والوصف المعتمد لمادتي الفيزياء والرياضيات -->
+    <header class="max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-lg mb-8 border-4 border-teal-400">
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2" data-ar="📐 2H-Jan-2020" data-en="📐 Interactive Exam: 2H-Jan-2020">📐 2H-Jan-2020</h1>
+            <h2 class="text-lg text-teal-600 font-semibold" data-ar="مادة العلوم والتطبيقات" data-en="Grade &amp; Subject: Assessment Level">مادة العلوم والتطبيقات</h2>
+            <p class="text-sm text-gray-600 mt-2" data-ar="امتحان تفاعلي تطبيقي: مسائل حسابية دقيقة، معادلات وقوانين، رسوم بيانية SVG، ودوائر كهربية مع تصحيح فوري" data-en="Interactive STEM exam: Quantitative problems, formulas, SVG diagrams, circuits, and instant grading">امتحان تفاعلي تطبيقي: مسائل حسابية دقيقة، معادلات وقوانين، رسوم بيانية SVG، ودوائر كهربية مع تصحيح فوري</p>
+            <p class="text-xs text-green-600 mt-2 font-semibold" data-ar="💾 يتم حفظ تقدمك تلقائياً" data-en="💾 Your progress is saved automatically">💾 يتم حفظ تقدمك تلقائياً</p>
+        </div>
+        <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+            <span><span data-ar="📅 التاريخ:" data-en="📅 Date:">📅 التاريخ:</span> <input type="text" id="examDate" class="border-b-2 border-teal-300 bg-transparent w-28 text-center"></span>
+            <span><span data-ar="😊 الاسم:" data-en="😊 Name:">😊 الاسم:</span> <input type="text" id="studentName" class="border-b-2 border-teal-300 bg-transparent w-32 text-center" placeholder="اكتب اسمك"></span>
+            <span><span data-ar="🏫 الشعبة:" data-en="🏫 Class:">🏫 الشعبة:</span> <input type="text" id="studentClass" class="border-b-2 border-teal-300 bg-transparent w-28 text-center" placeholder="الشعبة"></span>
+            <span><span data-ar="⏰ المدة: 45 دقيقة" data-en="⏰ Duration: 45 min">⏰ المدة: 60 دقيقة</span></span>
+            <span><span data-ar="📊 المجموع: 100 درجة" data-en="📊 Total: 100 pts">📊 المجموع: 100 درجة</span></span>
+        </div>
+    </header>
+
+    <!-- 📝 صيغ وقوانين أساسية للامتحان -->
+    <div class="max-w-4xl mx-auto mb-6 bg-white p-4 rounded-xl shadow-md border-2 border-teal-200 no-print" id="notes-formula-box">
+        <h3 class="font-bold text-lg mb-3 text-teal-700 text-center" data-ar="📐 القوانين والصيغ الرياضية والفيزيائية الهامة" data-en="📐 Key Mathematical & Physical Formulas">📐 القوانين والصيغ الرياضية والفيزيائية الهامة</h3>
+        <div class="grid md:grid-cols-2 gap-3 text-sm" id="notes-content">
+            <div class="formula-box"><strong>قوانين الحركة والقدرة:</strong> $F = m \cdot a \quad , \quad v = v_0 + a t \quad , \quad P = \frac{V^2}{R}$</div>
+            <div class="formula-box"><strong>قوانين الكهرباء والتفاضل:</strong> $V = I \cdot R \quad , \quad \frac{d}{dx}(x^n) = n x^{n-1} \quad , \quad \int x^n dx = \frac{x^{n+1}}{n+1}$</div>
+        </div>
+            <div class="formula-box"><strong>قوانين الكهرباء والتفاضل:</strong> $V = I cdot R quad , quad rac{d}{dx}(x^n) = n x^{n-1} quad , quad int x^n dx = rac{x^{n+1}}{n+1}$</div>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto space-y-8" id="exam-content"></main>
+
+    <div class="text-center no-print pb-8 mt-8">
+        <button onclick="gradeExam()" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-lg px-10 py-4 rounded-2xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="🎯 صحح إجاباتي!" data-en="🎯 Grade My Answers!">🎯 صحح إجاباتي!</button>
+    </div>
+
+    <div id="results-panel" class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-2xl shadow-2xl border-4 border-teal-400 hidden no-print">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center" data-ar="🏆 نتيجتك يا بطل! 🏆" data-en="🏆 Your Results, Champion! 🏆">🏆 نتيجتك يا بطل! 🏆</h2>
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-teal-50 p-4 rounded-xl text-center"><p data-ar="😊 الاسم" data-en="😊 Name">😊 الاسم</p><p id="res-name" class="font-bold text-xl text-teal-700">-</p></div>
+            <div class="bg-emerald-50 p-4 rounded-xl text-center"><p data-ar="📅 التاريخ" data-en="📅 Date">📅 التاريخ</p><p id="res-date" class="font-bold text-xl text-emerald-700">-</p></div>
+            <div class="bg-teal-50 p-4 rounded-xl text-center"><p data-ar="🌟 المجموع" data-en="🌟 Score">🌟 المجموع</p><p id="res-total" class="font-bold text-3xl text-teal-600">0 / 100</p></div>
+        </div>
+        <div class="text-center mb-6">
+            <span id="success-badge" class="success-badge grade-excellent">-</span>
+            <p id="success-percent" class="text-4xl font-bold text-teal-600 mt-2">0%</p>
+            <p class="text-sm text-gray-500" data-ar="نسبة النجاح" data-en="Success Rate">نسبة النجاح</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-xl mb-6">
+            <h3 class="font-bold text-lg mb-4 text-gray-800" data-ar="📊 أدائك في كل قسم:" data-en="📊 Your Performance:">📊 أدائك في كل قسم:</h3>
+            <div class="space-y-3" id="sections-performance"></div>
+        </div>
+        <div class="text-center mb-6">
+            <button id="sendEmailBtn" onclick="sendResultsToEmail()" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-lg px-8 py-3 rounded-2xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="📧 أرسل النتيجة للمعلم" data-en="📧 Send Results to Teacher">📧 أرسل النتيجة للمعلم</button>
+            <p id="emailStatus" class="text-sm mt-2 text-center font-medium"></p>
+        </div>
+        <div class="flex gap-3 justify-center">
+            <button onclick="window.print()" class="bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold" data-ar="🖨️ طباعة النتيجة" data-en="🖨️ Print Results">🖨️ طباعة النتيجة</button>
+        </div>
+    </div>
+
+    <footer class="max-w-4xl mx-auto mt-10 mb-8 text-center text-gray-500 text-sm no-print">
+        © <span data-ar="2H-Jan-2020" data-en="Interactive Exam: 2H-Jan-2020">2H-Jan-2020</span> | Mr. Mohammed Hesham 📐
+    </footer>
+
+<script>
+// ==================== إعدادات EmailJS ====================
+const PUBLIC_KEY = "Rb3Lq8tXaFmc5YHUH";
+const SERVICE_ID = "service_w15m64i";
+const TEMPLATE_ID = "template_5b0u2tq";
+const TARGET_EMAIL = "mohammedhesham872@gmail.com";
+emailjs.init(PUBLIC_KEY);
+
+// ==================== 💾 نظام حفظ التقدم ====================
+// 📝 غيّر اسم المفتاح ليكون فريداً لكل امتحان جديد
+const STORAGE_KEY = 'hesham_exam_mufhrp49'; 
+
+// ⚠️ هام: يجب أن تتطابق هذه الأرقام مع عدد الأسئلة والأقسام التي تضعها في originalExamData بالأسفل
+const TOTAL_TIME = 2700; // الوقت بالثواني (3600 = 60 دقيقة)
+const TOTAL_QUESTIONS = 20; // العدد الكلي للأسئلة
+const TOTAL_SECTIONS = 5; // العدد الكلي للأقسام
+const QUESTIONS_PER_SECTION = 4; // عدد الأسئلة في كل قسم (لحساب الدرجات)
+
+let currentSeed = null;
+let answersVisible = false;
+let saveIndicatorTimeout = null;
+
+function mulberry32(a) {
+    return function() {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+let rng = null;
+
+function showSaveIndicator() {
+    const indicator = document.getElementById('saveIndicator');
+    if (!indicator) return;
+    indicator.classList.add('show');
+    if (saveIndicatorTimeout) clearTimeout(saveIndicatorTimeout);
+    saveIndicatorTimeout = setTimeout(() => indicator.classList.remove('show'), 1500);
+}
+
+const _memoryStore = {};
+function safeStorageGet(k) {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) return window.localStorage.getItem(k);
+    } catch(e) {}
+    return _memoryStore[k] || null;
+}
+function safeStorageSet(k, v) {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) { window.localStorage.setItem(k, v); return; }
+    } catch(e) {}
+    _memoryStore[k] = String(v);
+}
+function safeStorageRemove(k) {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) { window.localStorage.removeItem(k); return; }
+    } catch(e) {}
+    delete _memoryStore[k];
+}
+
+function saveState(showIndicator = true) {
+    try {
+        const state = {
+            seed: currentSeed, lang: currentLang,
+            studentName: document.getElementById('studentName')?.value || '',
+            studentClass: document.getElementById('studentClass')?.value || '',
+            examDate: document.getElementById('examDate')?.value || '',
+            answers: getSelectedAnswers(),
+            timeRemaining: timeRemaining,
+            answersVisible: answersVisible, savedAt: Date.now()
+        };
+        safeStorageSet(STORAGE_KEY, JSON.stringify(state));
+        if (showIndicator) showSaveIndicator();
+    } catch (e) {}
+}
+
+function loadState() {
+    try {
+        const saved = safeStorageGet(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+}
+
+function getSelectedAnswers() {
+    const answers = {};
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected) answers[i] = selected.value;
+    }
+    return answers;
+}
+
+function restoreAnswers(answers) {
+    if (!answers) return;
+    for (const [idx, val] of Object.entries(answers)) {
+        const radio = document.querySelector(`input[name="q${idx}"][value="${val}"]`);
+        if (radio) radio.checked = true;
+    }
+}
+
+function clearProgress() {
+    const confirmMsg = currentLang === 'ar' ? '⚠️ هل أنت متأكد من مسح كل التقدم؟' : '⚠️ Are you sure you want to clear all progress?';
+    if (confirm(confirmMsg)) { safeStorageRemove(STORAGE_KEY); location.reload(); }
+}
+
+function setupAnswerListeners() {
+    const content = document.getElementById('exam-content');
+    if (content) {
+        content.addEventListener('change', (e) => {
+            if (e.target.type === 'radio') saveState();
+        });
+    }
+}
+
+function setupInputListeners() {
+    ['studentName', 'studentClass', 'examDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => saveState(false));
+            el.addEventListener('blur', () => saveState());
+        }
+    });
+}
+
+// =====================================================================
+// 📝 بنك الأسئلة التفاعلية لمادتي الفيزياء والرياضيات (20 مسألة عبر 5 أقسام)
+// =====================================================================
+const originalExamData = {
+    "sections": [
+        {
+            "id": "sec1",
+            "title": {
+                "ar": "🔹 الجزء 1: المفاهيم والأساسيات",
+                "en": "🔹 Part 1: Core Concepts & Fundamentals"
+            },
+            "questions": [
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 a^m / a^n = a^(m-n), a^m * a^n = a^(m+n)</span></div>بسط المقدار (y^12) / (y^3) واكتب (5^6 * 5^2) / 5^4 كقوة واحدة للعدد 5.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 a^m / a^n = a^(m-n), a^m * a^n = a^(m+n)</span></div>Simplify (y^12) / (y^3) and write (5^6 * 5^2) / 5^4 as a single power of 5."
+                    },
+                    "options": [
+                        {
+                            "ar": "y^4, 5^4",
+                            "en": "y^4, 5^4"
+                        },
+                        {
+                            "ar": "y^9, 5^4",
+                            "en": "y^9, 5^4"
+                        },
+                        {
+                            "ar": "y^4, 5^12",
+                            "en": "y^4, 5^12"
+                        },
+                        {
+                            "ar": "y^9, 5^8",
+                            "en": "y^9, 5^8"
+                        }
+                    ],
+                    "correct": 1,
+                    "answer": {
+                        "ar": "باستخدام قوانين الأسس: y^(12-3) = y^9. للجزء الثاني: 5^(6+2-4) = 5^4.",
+                        "en": "Using exponent laws: y^(12-3) = y^9. For the second part: 5^(6+2-4) = 5^4."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 1 m^3 = 1,000,000 cm^3</span></div>حول 15.6 متر مكعب إلى سنتيمتر مكعب.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 1 m^3 = 1,000,000 cm^3</span></div>Convert 15.6 m^3 into cm^3."
+                    },
+                    "options": [
+                        {
+                            "ar": "15600 سم^3",
+                            "en": "15600 cm^3"
+                        },
+                        {
+                            "ar": "156000 سم^3",
+                            "en": "156000 cm^3"
+                        },
+                        {
+                            "ar": "15600000 سم^3",
+                            "en": "15600000 cm^3"
+                        },
+                        {
+                            "ar": "156000000 سم^3",
+                            "en": "156000000 cm^3"
+                        }
+                    ],
+                    "correct": 2,
+                    "answer": {
+                        "ar": "بما أن 1 متر = 100 سم، فإن 1 متر مكعب = (100)^3 سم مكعب = 1,000,000 سم مكعب. إذن 15.6 * 1,000,000 = 15,600,000.",
+                        "en": "Since 1 m = 100 cm, 1 m^3 = (100)^3 cm^3 = 1,000,000 cm^3. So 15.6 * 1,000,000 = 15,600,000."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Fraction addition</span></div>أثبت أن 2 1/4 + 1 3/8 = 3 5/8.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Fraction addition</span></div>Show that 2 1/4 + 1 3/8 = 3 5/8."
+                    },
+                    "options": [
+                        {
+                            "ar": "صحيح",
+                            "en": "True"
+                        },
+                        {
+                            "ar": "خطأ",
+                            "en": "False"
+                        },
+                        {
+                            "ar": "لا يمكن تحديده",
+                            "en": "Cannot be determined"
+                        },
+                        {
+                            "ar": "لا شيء مما سبق",
+                            "en": "None of the above"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "2 1/4 = 2 2/8. بجمع 2 2/8 + 1 3/8 = 3 5/8.",
+                        "en": "2 1/4 = 2 2/8. Adding 2 2/8 + 1 3/8 = 3 5/8."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Sum of angles in a triangle = 180°</span></div>في مثلث، الزوايا هي 40°، (2x + 10)°، و (x + 10)°. أوجد قيمة x.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Sum of angles in a triangle = 180°</span></div>In a triangle, the angles are 40°, (2x + 10)°, and (x + 10)°. Find x."
+                    },
+                    "options": [
+                        {
+                            "ar": "30",
+                            "en": "30"
+                        },
+                        {
+                            "ar": "40",
+                            "en": "40"
+                        },
+                        {
+                            "ar": "50",
+                            "en": "50"
+                        },
+                        {
+                            "ar": "60",
+                            "en": "60"
+                        }
+                    ],
+                    "correct": 1,
+                    "answer": {
+                        "ar": "40 + 2x + 10 + x + 10 = 180 => 3x + 60 = 180 => 3x = 120 => x = 40.",
+                        "en": "40 + 2x + 10 + x + 10 = 180 => 3x + 60 = 180 => 3x = 120 => x = 40."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sec2",
+            "title": {
+                "ar": "🔹 الجزء 2: التطبيقات والمعادلات",
+                "en": "🔹 Part 2: Formulas & Applied Problems"
+            },
+            "questions": [
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">استنتاج وتطبيق تفاعلي</span><span class=\"q-law-pill\">📐 Angle bisector construction</span></div>أي إنشاء هندسي يُستخدم لتقسيم الزاوية إلى جزأين متساويين؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Interactive Reasoning</span><span class=\"q-law-pill\">📐 Angle bisector construction</span></div>Which construction is used to divide an angle into two equal parts?"
+                    },
+                    "options": [
+                        {
+                            "ar": "منصف العمود",
+                            "en": "Perpendicular bisector"
+                        },
+                        {
+                            "ar": "منصف الزاوية",
+                            "en": "Angle bisector"
+                        },
+                        {
+                            "ar": "خط موازٍ",
+                            "en": "Parallel line"
+                        },
+                        {
+                            "ar": "متوسط",
+                            "en": "Median"
+                        }
+                    ],
+                    "correct": 1,
+                    "answer": {
+                        "ar": "إنشاء منصف الزاوية يقسم الزاوية إلى جزأين متساويين.",
+                        "en": "The angle bisector construction divides an angle into two equal parts."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Sum of probabilities = 1</span></div>حقيبة تحتوي على خرز أحمر، أزرق، أخضر. احتمال الأزرق 0.3، احتمال الأخضر 0.4. إذا كان هناك 200 خرزة، كم عدد الخرز الأحمر؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Sum of probabilities = 1</span></div>A bag has red, blue, green beads. P(blue)=0.3, P(green)=0.4. If there are 200 beads, how many are red?"
+                    },
+                    "options": [
+                        {
+                            "ar": "60",
+                            "en": "60"
+                        },
+                        {
+                            "ar": "70",
+                            "en": "70"
+                        },
+                        {
+                            "ar": "80",
+                            "en": "80"
+                        },
+                        {
+                            "ar": "90",
+                            "en": "90"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "احتمال الأحمر = 1 - (0.3 + 0.4) = 0.3. عدد الأحمر = 0.3 * 200 = 60.",
+                        "en": "P(red) = 1 - (0.3 + 0.4) = 0.3. Number of red = 0.3 * 200 = 60."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Linear inequality</span></div>حل المتباينة 3x - 5 < 10.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Linear inequality</span></div>Solve the inequality 3x - 5 < 10."
+                    },
+                    "options": [
+                        {
+                            "ar": "x < 5",
+                            "en": "x < 5"
+                        },
+                        {
+                            "ar": "x > 5",
+                            "en": "x > 5"
+                        },
+                        {
+                            "ar": "x < 15",
+                            "en": "x < 15"
+                        },
+                        {
+                            "ar": "x > 15",
+                            "en": "x > 15"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "3x < 15 => x < 5.",
+                        "en": "3x < 15 => x < 5."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Percentage increase = (change/original) * 100</span></div>سعر ارتفع من 200 إلى 250. ما هي النسبة المئوية للزيادة؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Percentage increase = (change/original) * 100</span></div>A price increases from 200 to 250. What is the percentage increase?"
+                    },
+                    "options": [
+                        {
+                            "ar": "20%",
+                            "en": "20%"
+                        },
+                        {
+                            "ar": "25%",
+                            "en": "25%"
+                        },
+                        {
+                            "ar": "30%",
+                            "en": "30%"
+                        },
+                        {
+                            "ar": "50%",
+                            "en": "50%"
+                        }
+                    ],
+                    "correct": 1,
+                    "answer": {
+                        "ar": "(50/200) * 100 = 25%.",
+                        "en": "(50/200) * 100 = 25%."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sec3",
+            "title": {
+                "ar": "🔹 الجزء 3: التحليل والاستنتاج",
+                "en": "🔹 Part 3: Analysis & Derivations"
+            },
+            "questions": [
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Mass = Density * Volume</span></div>الكثافة = 5 جم/سم^3، الحجم = 20 سم^3. أوجد الكتلة.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Mass = Density * Volume</span></div>Density = 5 g/cm^3, Volume = 20 cm^3. Find mass."
+                    },
+                    "options": [
+                        {
+                            "ar": "4 جم",
+                            "en": "4 g"
+                        },
+                        {
+                            "ar": "15 جم",
+                            "en": "15 g"
+                        },
+                        {
+                            "ar": "25 جم",
+                            "en": "25 g"
+                        },
+                        {
+                            "ar": "100 جم",
+                            "en": "100 g"
+                        }
+                    ],
+                    "correct": 3,
+                    "answer": {
+                        "ar": "الكتلة = 5 * 20 = 100 جم.",
+                        "en": "Mass = 5 * 20 = 100 g."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Conversion: km/h to m/s (divide by 3.6)</span></div>حول 72 كم/ساعة إلى متر/ثانية.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Conversion: km/h to m/s (divide by 3.6)</span></div>Convert 72 km/h to m/s."
+                    },
+                    "options": [
+                        {
+                            "ar": "10 م/ث",
+                            "en": "10 m/s"
+                        },
+                        {
+                            "ar": "20 م/ث",
+                            "en": "20 m/s"
+                        },
+                        {
+                            "ar": "30 م/ث",
+                            "en": "30 m/s"
+                        },
+                        {
+                            "ar": "40 م/ث",
+                            "en": "40 m/s"
+                        }
+                    ],
+                    "correct": 1,
+                    "answer": {
+                        "ar": "72 / 3.6 = 20 م/ث.",
+                        "en": "72 / 3.6 = 20 m/s."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 a^2 + b^2 = c^2</span></div>مثلث قائم الزاوية أضلاعه 3 سم و 4 سم. أوجد الوتر.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 a^2 + b^2 = c^2</span></div>A right triangle has sides 3cm and 4cm. Find the hypotenuse."
+                    },
+                    "options": [
+                        {
+                            "ar": "5 سم",
+                            "en": "5 cm"
+                        },
+                        {
+                            "ar": "6 سم",
+                            "en": "6 cm"
+                        },
+                        {
+                            "ar": "7 سم",
+                            "en": "7 cm"
+                        },
+                        {
+                            "ar": "12 سم",
+                            "en": "12 cm"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "جذر(3^2 + 4^2) = جذر(9 + 16) = 5.",
+                        "en": "sqrt(3^2 + 4^2) = sqrt(9 + 16) = 5."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Currency conversion</span></div>إذا كان 1 دولار = 7 كرونة، أيهما أفضل: 100 دولار مقابل 800 وحدة أم 700 كرونة مقابل 800 وحدة؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Currency conversion</span></div>If 1 USD = 7 Krone, which is better: 100 USD for 800 units or 700 Krone for 800 units?"
+                    },
+                    "options": [
+                        {
+                            "ar": "100 دولار",
+                            "en": "100 USD"
+                        },
+                        {
+                            "ar": "700 كرونة",
+                            "en": "700 Krone"
+                        },
+                        {
+                            "ar": "متساويان",
+                            "en": "Equal"
+                        },
+                        {
+                            "ar": "لا يمكن تحديده",
+                            "en": "Cannot determine"
+                        }
+                    ],
+                    "correct": 2,
+                    "answer": {
+                        "ar": "100 دولار = 700 كرونة. كلاهما متساوي.",
+                        "en": "100 USD = 700 Krone. Both are equal."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sec4",
+            "title": {
+                "ar": "🔹 الجزء 4: المسائل المتقدمة",
+                "en": "🔹 Part 4: Advanced Problem Solving"
+            },
+            "questions": [
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">استنتاج وتطبيق تفاعلي</span><span class=\"q-law-pill\">📐 Angle at center = 2 * Angle at circumference</span></div>في دائرة، إذا كانت الزاوية المركزية 80°، فما هي الزاوية المحيطية المقابلة لنفس القوس؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Interactive Reasoning</span><span class=\"q-law-pill\">📐 Angle at center = 2 * Angle at circumference</span></div>In a circle, if the angle at the center is 80°, what is the angle at the circumference subtended by the same arc?"
+                    },
+                    "options": [
+                        {
+                            "ar": "40°",
+                            "en": "40°"
+                        },
+                        {
+                            "ar": "80°",
+                            "en": "80°"
+                        },
+                        {
+                            "ar": "160°",
+                            "en": "160°"
+                        },
+                        {
+                            "ar": "20°",
+                            "en": "20°"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "الزاوية المحيطية = 80 / 2 = 40°.",
+                        "en": "Angle at circumference = 80 / 2 = 40°."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Probability of dependent events</span></div>صندوق به 3 كرات حمراء و 2 زرقاء. عند سحب كرتين بدون إرجاع، ما احتمال سحب كرتين حمراوين؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Probability of dependent events</span></div>A box has 3 red and 2 blue balls. Picking two without replacement, what is the probability of picking two red?"
+                    },
+                    "options": [
+                        {
+                            "ar": "3/10",
+                            "en": "3/10"
+                        },
+                        {
+                            "ar": "3/5",
+                            "en": "3/5"
+                        },
+                        {
+                            "ar": "9/25",
+                            "en": "9/25"
+                        },
+                        {
+                            "ar": "6/20",
+                            "en": "6/20"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "(3/5) * (2/4) = 6/20 = 3/10.",
+                        "en": "(3/5) * (2/4) = 6/20 = 3/10."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">دالة وعلاقة بيانية وتناسب</span><span class=\"q-law-pill\">📐 Reciprocal function</span></div>أي رسم بياني يمثل y = 1/x؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Function & Graph</span><span class=\"q-law-pill\">📐 Reciprocal function</span></div>Which graph represents y = 1/x?"
+                    },
+                    "options": [
+                        {
+                            "ar": "خط مستقيم",
+                            "en": "Straight line"
+                        },
+                        {
+                            "ar": "قطع مكافئ",
+                            "en": "Parabola"
+                        },
+                        {
+                            "ar": "قطع زائد",
+                            "en": "Hyperbola"
+                        },
+                        {
+                            "ar": "دالة أسية",
+                            "en": "Exponential"
+                        }
+                    ],
+                    "correct": 2,
+                    "answer": {
+                        "ar": "y = 1/x هو قطع زائد.",
+                        "en": "y = 1/x is a hyperbola."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Algebraic manipulation</span></div>اجعل x موضوع القانون: y = (x + 2) / (x - 1).",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Algebraic manipulation</span></div>Make x the subject: y = (x + 2) / (x - 1)."
+                    },
+                    "options": [
+                        {
+                            "ar": "x = (y+2)/(y-1)",
+                            "en": "x = (y+2)/(y-1)"
+                        },
+                        {
+                            "ar": "x = (y+1)/(y-1)",
+                            "en": "x = (y+1)/(y-1)"
+                        },
+                        {
+                            "ar": "x = (y+2)/(1-y)",
+                            "en": "x = (y+2)/(1-y)"
+                        },
+                        {
+                            "ar": "x = (2+y)/(y-1)",
+                            "en": "x = (2+y)/(y-1)"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "y(x-1) = x+2 => yx - y = x + 2 => x(y-1) = y+2 => x = (y+2)/(y-1).",
+                        "en": "y(x-1) = x+2 => yx - y = x + 2 => x(y-1) = y+2 => x = (y+2)/(y-1)."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sec5",
+            "title": {
+                "ar": "🔹 الجزء 5: التقييم الشامل",
+                "en": "🔹 Part 5: Comprehensive Evaluation"
+            },
+            "questions": [
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">استنتاج وتطبيق تفاعلي</span><span class=\"q-law-pill\">📐 Algebraic expansion</span></div>الفرق بين (n+1)^2 و n^2 هو دائماً:",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Interactive Reasoning</span><span class=\"q-law-pill\">📐 Algebraic expansion</span></div>The difference between (n+1)^2 and n^2 is always:"
+                    },
+                    "options": [
+                        {
+                            "ar": "زوجي",
+                            "en": "Even"
+                        },
+                        {
+                            "ar": "فردي",
+                            "en": "Odd"
+                        },
+                        {
+                            "ar": "أولي",
+                            "en": "Prime"
+                        },
+                        {
+                            "ar": "مربع",
+                            "en": "Square"
+                        }
+                    ],
+                    "correct": 1,
+                    "answer": {
+                        "ar": "(n^2 + 2n + 1) - n^2 = 2n + 1، وهو دائماً فردي.",
+                        "en": "(n^2 + 2n + 1) - n^2 = 2n + 1, which is always odd."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">تجربة عملية وجدول قياسات</span><span class=\"q-law-pill\">📐 Frequency = Density * Width</span></div>في المدرج التكراري، إذا كانت كثافة التكرار 2 والعرض 5، فما هو التكرار؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Experiment & Table</span><span class=\"q-law-pill\">📐 Frequency = Density * Width</span></div>In a histogram, if frequency density is 2 and width is 5, what is the frequency?"
+                    },
+                    "options": [
+                        {
+                            "ar": "2.5",
+                            "en": "2.5"
+                        },
+                        {
+                            "ar": "7",
+                            "en": "7"
+                        },
+                        {
+                            "ar": "10",
+                            "en": "10"
+                        },
+                        {
+                            "ar": "3",
+                            "en": "3"
+                        }
+                    ],
+                    "correct": 2,
+                    "answer": {
+                        "ar": "التكرار = 2 * 5 = 10.",
+                        "en": "Frequency = 2 * 5 = 10."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">دالة وعلاقة بيانية وتناسب</span><span class=\"q-law-pill\">📐 m1 * m2 = -1</span></div>ما هو ميل الخط العمودي على y = 2x + 5؟",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Function & Graph</span><span class=\"q-law-pill\">📐 m1 * m2 = -1</span></div>What is the slope of a line perpendicular to y = 2x + 5?"
+                    },
+                    "options": [
+                        {
+                            "ar": "2",
+                            "en": "2"
+                        },
+                        {
+                            "ar": "-2",
+                            "en": "-2"
+                        },
+                        {
+                            "ar": "0.5",
+                            "en": "0.5"
+                        },
+                        {
+                            "ar": "-0.5",
+                            "en": "-0.5"
+                        }
+                    ],
+                    "correct": 3,
+                    "answer": {
+                        "ar": "ميل العمودي هو المعكوس الضربي السالب لـ 2، وهو -0.5.",
+                        "en": "Perpendicular slope is negative reciprocal of 2, which is -0.5."
+                    }
+                },
+                {
+                    "q": {
+                        "ar": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">مسألة حسابية وتطبيق قانون</span><span class=\"q-law-pill\">📐 Width = Area / Length</span></div>مساحة مستطيل = 10، الطول = جذر(5) + 1. أوجد العرض.",
+                        "en": "<div class=\"q-meta-badges\"><span class=\"q-category-pill\">Applied Problem & Law</span><span class=\"q-law-pill\">📐 Width = Area / Length</span></div>Area of rectangle = 10, length = sqrt(5) + 1. Find width."
+                    },
+                    "options": [
+                        {
+                            "ar": "2.5(جذر(5)-1)",
+                            "en": "2.5(sqrt(5)-1)"
+                        },
+                        {
+                            "ar": "5(جذر(5)-1)",
+                            "en": "5(sqrt(5)-1)"
+                        },
+                        {
+                            "ar": "2(جذر(5)+1)",
+                            "en": "2(sqrt(5)+1)"
+                        },
+                        {
+                            "ar": "جذر(5)-1",
+                            "en": "sqrt(5)-1"
+                        }
+                    ],
+                    "correct": 0,
+                    "answer": {
+                        "ar": "العرض = 10 / (جذر(5)+1). بالإنطاق: 10(جذر(5)-1) / (5-1) = 10(جذر(5)-1)/4 = 2.5(جذر(5)-1).",
+                        "en": "Width = 10 / (sqrt(5)+1). Rationalizing: 10(sqrt(5)-1) / (5-1) = 10(sqrt(5)-1)/4 = 2.5(sqrt(5)-1)."
+                    }
+                }
+            ]
+        }
+    ]
+};
+// =====================================================================
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+let examData;
+let correctAnswersMap = {};
+let currentLang = 'ar';
+let timeRemaining = TOTAL_TIME;
+let timerInterval;
+
+function prepareShuffledExam() {
+    rng = mulberry32(currentSeed);
+    examData = JSON.parse(JSON.stringify(originalExamData));
+    correctAnswersMap = {};
+    let globalIdx = 0;
+    examData.sections.forEach((section) => {
+        section.questions = shuffleArray(section.questions);
+        section.questions.forEach((q) => {
+            const optionsWithCorrect = q.options.map((opt, idx) => ({ option: opt, isCorrect: idx === q.correct }));
+            const shuffledOptions = shuffleArray(optionsWithCorrect);
+            q.options = shuffledOptions.map(o => o.option);
+            q.correct = shuffledOptions.findIndex(o => o.isCorrect);
+            correctAnswersMap[globalIdx] = String.fromCharCode(97 + q.correct);
+            globalIdx++;
+        });
+    });
+}
+
+function reshuffleExam() {
+    const msg = currentLang === 'ar' ? '🔄 سيتم إنشاء أسئلة جديدة ومسح إجاباتك الحالية. هل أنت متأكد؟' : '🔄 New questions will be generated and current answers cleared. Are you sure?';
+    if (confirm(msg)) {
+        currentSeed = Date.now(); timeRemaining = TOTAL_TIME; answersVisible = false;
+        prepareShuffledExam(); renderExam(); saveState();
+        alert(currentLang === 'ar' ? '🎲 تم تغيير الأسئلة! حظاً موفقاً! 🍀' : '🎲 Questions changed! Good luck! 🍀');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    const btnAr = document.getElementById('btn-ar');
+    const btnEn = document.getElementById('btn-en');
+    if (btnAr) btnAr.classList.toggle('active', lang === 'ar');
+    if (btnEn) btnEn.classList.toggle('active', lang === 'en');
+    document.body.classList.toggle('en-mode', lang === 'en');
+    document.querySelectorAll('[data-ar][data-en]').forEach(el => {
+        el.innerHTML = lang === 'ar' ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+    });
+    renderExam(); saveState(false);
+}
+
+function renderExam() {
+    const container = document.getElementById('exam-content');
+    if (!container) return;
+    const labels = { ar: { option: ['أ', 'ب', 'ج', 'د'], answer: '✅ الإجابة:' }, en: { option: ['A', 'B', 'C', 'D'], answer: '✅ Answer:' } };
+    const lbl = labels[currentLang]; const isRTL = currentLang === 'ar';
+    let html = ''; let globalIdx = 0;
+    examData.sections.forEach((section) => {
+        html += `<section class="bg-white p-6 rounded-2xl shadow-lg border-2 border-teal-100">
+            <h2 class="text-xl font-bold mb-4 text-teal-700">${section.title[currentLang]}</h2>
+            <ol class="space-y-4 text-sm">`;
+        section.questions.forEach((q) => {
+            const bs = isRTL ? 'border-r-4 pr-4' : 'border-l-4 pl-4';
+            html += `<li class="${bs} border-teal-400 py-2" id="q-${globalIdx}">
+                <strong>${globalIdx + 1}.</strong> ${q.q[currentLang]}<br>`;
+            q.options.forEach((opt, oIdx) => {
+                const rs = isRTL ? 'mr-4 ml-2' : 'ml-4 mr-2';
+                html += `<label class="cursor-pointer block mt-1 ${isRTL ? 'mr-4' : 'ml-4'} hover:bg-teal-50 rounded-lg p-1 transition">
+                    <input type="radio" name="q${globalIdx}" value="${String.fromCharCode(97 + oIdx)}" class="${rs}">
+                    ${lbl.option[oIdx]}) ${opt[currentLang]}</label>`;
+            });
+            html += `<div class="answer-box text-green-700 mt-2 font-medium ${answersVisible ? '' : 'hidden'} bg-green-50 rounded-lg p-2">
+                ${lbl.answer} ${lbl.option[q.correct]}) ${q.options[q.correct][currentLang]} — ${q.answer[currentLang]}</div></li>`;
+            globalIdx++;
+        });
+        html += `</ol></section>`;
+    });
+    container.innerHTML = html;
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeRemaining--; updateTimerDisplay();
+        if (timeRemaining % 60 === 0) saveState(false);
+        const timerEl = document.getElementById('timer');
+        if (timerEl && timeRemaining <= 600) timerEl.classList.add('timer-warning');
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert(currentLang === 'ar' ? "⏰ انتهى الوقت!" : "⏰ Time's up!");
+            gradeExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeRemaining / 60); const s = timeRemaining % 60;
+    const timerEl = document.getElementById('timer');
+    if (timerEl) timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+function toggleAnswers() {
+    answersVisible = !answersVisible;
+    document.querySelectorAll('.answer-box').forEach(el => el.classList.toggle('hidden', !answersVisible));
+    saveState(false);
+}
+
+function gradeExam() {
+    let correctCount = 0;
+    const sectionScores = new Array(TOTAL_SECTIONS).fill(0);
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const li = document.getElementById(`q-${i}`);
+        if (li) {
+            const isCorrect = sel && sel.value === correctAnswersMap[i];
+            if (isCorrect) { 
+                correctCount++; 
+                li.classList.add('correct'); 
+                li.classList.remove('incorrect'); 
+                const secIdx = Math.min(TOTAL_SECTIONS - 1, Math.floor(i / Math.max(1, QUESTIONS_PER_SECTION)));
+                if (sectionScores[secIdx] !== undefined) sectionScores[secIdx]++; 
+            }
+            else { li.classList.add('incorrect'); li.classList.remove('correct'); }
+        }
+    }
+    const score = TOTAL_QUESTIONS > 0 ? Math.round((correctCount / TOTAL_QUESTIONS) * 100) : 0;
+    const resTotal = document.getElementById('res-total');
+    if (resTotal) resTotal.textContent = `${score} / 100`;
+    const resName = document.getElementById('res-name');
+    if (resName) resName.textContent = document.getElementById('studentName')?.value || (currentLang === 'ar' ? 'بطل' : 'Champion');
+    const resDate = document.getElementById('res-date');
+    if (resDate) resDate.textContent = new Date().toLocaleDateString(currentLang === 'ar' ? 'ar-AE' : 'en-US');
+    const pc = document.getElementById('sections-performance');
+    if (pc) {
+        pc.innerHTML = '';
+        examData.sections.forEach((s, idx) => {
+            const secQCount = originalExamData.sections[idx]?.questions.length || QUESTIONS_PER_SECTION;
+            pc.innerHTML += `<div class="flex justify-between items-center"><span class="text-gray-700">${s.title[currentLang]}</span><span class="font-bold text-teal-700">${sectionScores[idx] || 0}/${secQCount}</span></div>`;
+        });
+    }
+    const badge = document.getElementById('success-badge');
+    const successPercent = document.getElementById('success-percent');
+    if (successPercent) successPercent.textContent = `${score}%`;
+    if (badge) {
+        if (currentLang === 'ar') {
+            if (score >= 90) { badge.textContent = '🌟 ممتاز جداً!'; badge.className = 'success-badge grade-excellent'; }
+            else if (score >= 75) { badge.textContent = '👏 ممتاز!'; badge.className = 'success-badge grade-good'; }
+            else if (score >= 50) { badge.textContent = '👍 جيد'; badge.className = 'success-badge grade-pass'; }
+            else { badge.textContent = '💪 حاول مرة أخرى'; badge.className = 'success-badge grade-fail'; }
+        } else {
+            if (score >= 90) { badge.textContent = '🌟 Outstanding!'; badge.className = 'success-badge grade-excellent'; }
+            else if (score >= 75) { badge.textContent = '👏 Excellent!'; badge.className = 'success-badge grade-good'; }
+            else if (score >= 50) { badge.textContent = '👍 Good'; badge.className = 'success-badge grade-pass'; }
+            else { badge.textContent = '💪 Try Again'; badge.className = 'success-badge grade-fail'; }
+        }
+    }
+    const resultsPanel = document.getElementById('results-panel');
+    if (resultsPanel) {
+        resultsPanel.classList.remove('hidden');
+        resultsPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+    if (timerInterval) clearInterval(timerInterval);
+}
+
+function sendResultsToEmail() {
+    const btn = document.getElementById('sendEmailBtn');
+    const status = document.getElementById('emailStatus');
+    if (!btn || !status) return;
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ar' ? '⏳ جاري الإرسال...' : '⏳ Sending...';
+    const name = document.getElementById('studentName')?.value || 'N/A';
+    const studentClass = document.getElementById('studentClass')?.value || 'N/A';
+    const date = document.getElementById('examDate')?.value || new Date().toLocaleDateString();
+    const score = document.getElementById('res-total')?.textContent || '0 / 100';
+    const successRate = document.getElementById('success-percent')?.textContent || '0%';
+    const badge = document.getElementById('success-badge')?.textContent || '-';
+    let questionsHTML = ''; let globalIdx = 0;
+    examData.sections.forEach((section, sectionIdx) => {
+        questionsHTML += `<tr style="background:linear-gradient(135deg,#0d9488,#0f766e);color:white;"><td colspan="5" style="padding:12px;font-weight:bold;">📌 ${currentLang==='ar'?'القسم':'Section'} ${sectionIdx+1}: ${section.title[currentLang]}</td></tr>`;
+        section.questions.forEach((q) => {
+            const sel = document.querySelector(`input[name="q${globalIdx}"]:checked`);
+            const sv = sel ? sel.value : null; const cv = correctAnswersMap[globalIdx]; const ic = sv === cv;
+            let sat = currentLang==='ar'?'❌ لم يجب':'❌ No answer'; let sac = '#dc2626';
+            if (sv) { const si = sv.charCodeAt(0)-97; sat = q.options[si] ? q.options[si][currentLang] : 'N/A'; sac = ic?'#059669':'#dc2626'; }
+            const cat = q.options[q.correct] ? q.options[q.correct][currentLang] : 'N/A';
+            const rb = ic?'#f0fdf4':'#fef2f2'; const bl = ic?'4px solid #10b981':'4px solid #ef4444';
+            questionsHTML += `<tr style="background:${rb};border-right:${bl};"><td style="padding:10px;border:1px solid #e5e7eb;text-align:center;font-weight:bold;">${globalIdx+1}</td><td style="padding:10px;border:1px solid #e5e7eb;"><strong style="color:#0f766e;">${currentLang==='ar'?'❓ السؤال:':'❓ Question:'}</strong><br><span style="font-size:13px;">${q.q[currentLang]}</span></td><td style="padding:10px;border:1px solid #e5e7eb;"><strong style="color:${sac};">${currentLang==='ar'?'✍️ إجابة الطالب:':'✍️ Student:'}</strong><br><span style="color:${sac};font-size:13px;">${sat}</span></td><td style="padding:10px;border:1px solid #e5e7eb;"><strong style="color:#059669;">${currentLang==='ar'?'✅ الصحيحة:':'✅ Correct:'}</strong><br><span style="color:#059669;font-size:13px;">${cat}</span></td><td style="padding:10px;border:1px solid #e5e7eb;text-align:center;">${ic?'<span style="font-size:24px;">✅</span>':'<span style="font-size:24px;">❌</span>'}</td></tr>`;
+            globalIdx++;
+        });
+    });
+    const answersHTML = `<div style="font-family:'Segoe UI',Tahoma,Arial;direction:${currentLang==='ar'?'rtl':'ltr'};"><div style="background:linear-gradient(135deg,#0d9488,#0f766e);color:white;padding:20px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="margin:0;">${currentLang==='ar'?'نتيجة الامتحان':'Exam Result'}</h2><p style="margin:5px 0 0;opacity:0.9;">${currentLang==='ar'?'تقرير تفصيلي':'Detailed Report'}</p></div><div style="background:#f0fdfa;padding:15px;"><table style="width:100%;border-collapse:collapse;"><tr><td style="padding:8px;font-weight:bold;color:#0f766e;">${currentLang==='ar'?'😊 الاسم:':'😊 Name:'}</td><td style="padding:8px;">${name}</td><td style="padding:8px;font-weight:bold;color:#0f766e;">${currentLang==='ar'?'🏫 الشعبة:':'🏫 Class:'}</td><td style="padding:8px;">${studentClass}</td></tr><tr><td style="padding:8px;font-weight:bold;color:#0f766e;">${currentLang==='ar'?'📅 التاريخ:':'📅 Date:'}</td><td style="padding:8px;">${date}</td><td style="padding:8px;font-weight:bold;color:#0f766e;">${currentLang==='ar'?'🏆 التقدير:':'🏆 Grade:'}</td><td style="padding:8px;">${badge}</td></tr></table></div><div style="background:white;padding:20px;text-align:center;"><div style="display:inline-block;margin:0 15px;"><div style="font-size:32px;font-weight:bold;color:#0d9488;">${score}</div><div style="color:#6b7280;font-size:13px;">${currentLang==='ar'?'الدرجة':'Score'}</div></div><div style="display:inline-block;margin:0 15px;"><div style="font-size:32px;font-weight:bold;color:#059669;">${successRate}%</div><div style="color:#6b7280;font-size:13px;">${currentLang==='ar'?'النسبة':'Rate'}</div></div></div><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:#0d9488;color:white;"><th style="padding:10px;border:1px solid #0f766e;">#</th><th style="padding:10px;border:1px solid #0f766e;">${currentLang==='ar'?'السؤال':'Question'}</th><th style="padding:10px;border:1px solid #0f766e;">${currentLang==='ar'?'إجابة الطالب':'Student'}</th><th style="padding:10px;border:1px solid #0f766e;">${currentLang==='ar'?'الصحيحة':'Correct'}</th><th style="padding:10px;border:1px solid #0f766e;">${currentLang==='ar'?'النتيجة':'Result'}</th></tr></thead><tbody>${questionsHTML}</tbody></table><div style="background:linear-gradient(135deg,#f0fdfa,#ccfbf1);padding:15px;border-radius:0 0 10px 10px;"><p style="margin:0;color:#0f766e;text-align:center;">📐 <strong>${currentLang==='ar'?'أحسنت يا بطل!':'Great job!'}</strong> 📐</p><p style="margin:5px 0 0;color:#0f766e;text-align:center;font-size:12px;">${currentLang==='ar'?'تم الإرسال تلقائياً | Mr. Mohammed Hesham':'Auto-sent | Mr. Mohammed Hesham'}</p></div></div>`;
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, { to_email: TARGET_EMAIL, student_name: name, student_class: studentClass, exam_date: date, total_score: score, success_rate: successRate, grade: badge, answers_table: answersHTML }).then(() => {
+        status.textContent = currentLang==='ar'?'✅ تم الإرسال بنجاح!':'✅ Sent successfully!'; status.style.color = '#059669'; btn.textContent = currentLang==='ar'?'✓ تم':'✓ Sent';
+    }).catch(err => {
+        status.textContent = currentLang==='ar'?'❌ حدث خطأ':'❌ Error'; status.style.color = '#dc2626'; btn.disabled = false; btn.textContent = currentLang==='ar'?'📧 حاول مرة أخرى':'📧 Try Again'; console.error(err);
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = loadState();
+    if (saved && saved.seed) {
+        currentSeed = saved.seed; currentLang = saved.lang || 'ar';
+        timeRemaining = saved.timeRemaining !== undefined ? saved.timeRemaining : TOTAL_TIME;
+        answersVisible = saved.answersVisible || false;
+        document.documentElement.lang = currentLang;
+        document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        const btnAr = document.getElementById('btn-ar');
+        const btnEn = document.getElementById('btn-en');
+        if (btnAr) btnAr.classList.toggle('active', currentLang === 'ar');
+        if (btnEn) btnEn.classList.toggle('active', currentLang === 'en');
+        document.body.classList.toggle('en-mode', currentLang === 'en');
+        document.querySelectorAll('[data-ar][data-en]').forEach(el => { el.innerHTML = currentLang === 'ar' ? el.getAttribute('data-ar') : el.getAttribute('data-en'); });
+    } else { currentSeed = Date.now(); }
+    prepareShuffledExam(); renderExam();
+    if (saved) {
+        if (saved.studentName) { const el = document.getElementById('studentName'); if (el) el.value = saved.studentName; }
+        if (saved.studentClass) { const el = document.getElementById('studentClass'); if (el) el.value = saved.studentClass; }
+        if (saved.examDate) { const el = document.getElementById('examDate'); if (el) el.value = saved.examDate; }
+        if (saved.answers) restoreAnswers(saved.answers);
+    }
+    setupAnswerListeners(); setupInputListeners(); startTimer();
+});
+window.addEventListener('beforeunload', () => saveState(false));
+</script>
+</body>
+</html>
